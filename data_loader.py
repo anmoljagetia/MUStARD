@@ -73,8 +73,8 @@ class DataLoader:
             audio_features = None
 
         if config.use_target_video:
-            video_features_file = h5py.File('data/features/utterances_final/resnet_pool5.hdf5')
-            context_video_features_file = h5py.File('data/features/context_final/resnet_pool5.hdf5')
+            video_features_file = h5py.File('data/features/utterances_final/visual_utterance_resnet_pool5.hdf5')
+            context_video_features_file = h5py.File('data/features/context_final/visual_context_resnet_pool5.hdf5')
         else:
             video_features_file = None
             context_video_features_file = None
@@ -108,7 +108,7 @@ class DataLoader:
                                     context_video_features_file[ID][()] if context_video_features_file else None,
                                     text_bert_embeddings[idx] if text_bert_embeddings else None,
                                     context_bert_embeddings[idx] if context_bert_embeddings else None,
-                                    json[ID]["show"]))
+                                    json[ID]["show"],str(ID)))
             self.data_output.append( int(json[ID]["sarcasm"]) )
 
     def loadContextBert(self, dataset, ):
@@ -288,6 +288,7 @@ class DataHelper:
     CONTEXT_VIDEO_ID = 6
     TEXT_BERT_ID = 7
     CONTEXT_BERT_ID = 8
+    INDEX_ID = 10
 
     PAD_ID = 0
     UNK_ID = 1
@@ -624,7 +625,6 @@ class DataHelper:
 
         audio = self.getData(self.TARGET_AUDIO_ID, mode, 
                              "Set mode properly for TargetAudio method() : mode = train/test")
-
         return np.array([np.mean(feature_vector, axis=1) for feature_vector in audio])
 
 
@@ -633,9 +633,36 @@ class DataHelper:
     def getTargetVideoPool(self, mode=None):
         video = self.getData(self.TARGET_VIDEO_ID, mode,
                              "Set mode properly for TargetVideo method() : mode = train/test")
-
         return np.array([np.mean(feature_vector, axis=0) for feature_vector in video])
 
+    
+    def getContextVideoPool(self, mode=None):
+        video = self.getData(self.CONTEXT_VIDEO_ID, mode,
+                             "Set mode properly for TargetVideo method() : mode = train/test")
+        return np.array([np.mean(feature_vector, axis=0) for feature_vector in video])
+   
+
+   # These functions are used to return un-averaged embeddings from the video features
+    
+    def getTargetAudioPoolUnaveragedDict(self, mode=None):
+        audio = self.getData(self.TARGET_AUDIO_ID, mode, 
+                             "Set mode properly for TargetAudio method() : mode = train/test")
+        ids = self.getData(self.INDEX_ID, mode, "Audio IDs")
+        return dict(zip(ids, audio))
+
+
+    def getTargetVideoPoolUnaveragedDict(self, mode=None):
+        video = self.getData(self.TARGET_VIDEO_ID, mode,
+                             "Set mode properly for TargetVideo method() : mode = train/test")
+        ids = self.getData(self.INDEX_ID, mode, "Video IDs")
+        return dict(zip(ids, video))
+
+    
+    def getContextVideoPoolUnaveragedDict(self, mode=None):
+        video = self.getData(self.CONTEXT_VIDEO_ID, mode,
+                             "Set mode properly for TargetVideo method() : mode = train/test")
+        ids = self.getData(self.INDEX_ID, mode, "Video IDs")
+        return dict(zip(ids, video))
 
 if __name__ == "__main__":
     dataLoader = DataLoader(config.Config())
