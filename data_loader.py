@@ -643,7 +643,6 @@ class DataHelper:
    
 
    # These functions are used to return un-averaged embeddings from the video features
-    
     def getTargetAudioPoolUnaveragedDict(self, mode=None):
         audio = self.getData(self.TARGET_AUDIO_ID, mode, 
                              "Set mode properly for TargetAudio method() : mode = train/test")
@@ -663,6 +662,20 @@ class DataHelper:
                              "Set mode properly for TargetVideo method() : mode = train/test")
         ids = self.getData(self.INDEX_ID, mode, "Video IDs")
         return dict(zip(ids, video))
+
+
+    def getTargetBertFeatures(self, mode=None):
+        utterances = self.getData(self.TEXT_BERT_ID, mode, 
+                                  "Set mode properly for vectorizeUtterance method() : mode = train/test")
+        ids = self.getData(self.INDEX_ID, mode, "Text Utterance IDs")
+        return dict(zip(ids, utterances))
+
+    def getContextBertFeatures(self, mode=None):
+        utterances = self.getData(self.CONTEXT_BERT_ID, mode, 
+                                  "Set mode properly for vectorizeUtterance method() : mode = train/test")
+        ids = self.getData(self.INDEX_ID, mode, "Text Context IDs")
+        return dict(zip(ids, utterances))
+
 
 if __name__ == "__main__":
     dataLoader = DataLoader(config.Config())
